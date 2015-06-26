@@ -1,58 +1,48 @@
 class StlAsciiFormatError(Exception):
     pass
 
-def read_stl_ascii(path):
-    with open(path) as f:
-        counter = 0
-        line = f.readline()
-        if not line.startswith('solid'):
-            raise StlAsciiFormatError(counter, line)
+class Stl(object):
+    def __init__(self, path):
+        self.counter = -1
+        self.data = self.read_ascii(path)
 
+    def read_line_equals(self, f, line):
+        self.line = f.readline()[:-1]
+        self.counter+=1
+        if not self.line == line:
+            raise StlAsciiFormatError(self.counter, self.line)
+
+    def read_3_floats(self, f, prefix, shift):
+        self.line = f.readline()[:-1]
+        self.counter+=1
+        if self.line.startswith(prefix):
+            v1, v2, v3 = self.line[shift:].split(' ')
+        else:
+            raise StlAsciiFormatError(self.counter, self.line)
+        return v1, v2, v3
+
+    def read_ascii(self, path):
         result = []
-        while True:
-            line = f.readline()[:-1]
-            counter+=1
-            if line == 'endsolid':
-                return result
-            elif line.startswith('facet normal '):
-                n1, n2, n3 = line[13:].split()
+        with open(path) as f:
+            self.read_line_equals(f, 'solid')
 
-            line = f.readline()[:-1]
-            counter+=1
-            if not line == 'outer loop':
-                raise StlAsciiFormatError(counter, line)
+            while True:
+                self.line = f.readline()[:-1]
+                self.counter+=1
+                if self.line == 'endsolid':
+                    return result
+                elif self.line.startswith('facet normal '):
+                    n1, n2, n3 = self.line[13:].split()
 
-            line = f.readline()[:-1]
-            counter+=1
-            if line.startswith('vertex '):
-                v1, v2, v3 = line[7:].split(' ')
-            else:
-                raise StlAsciiFormatError(counter, line)
+                self.read_line_equals(f, 'outer loop')
 
-            line = f.readline()[:-1]
-            counter+=1
-            if line.startswith('vertex '):
-                v4, v5, v6 = line[7:].split(' ')
-            else:
-                raise StlAsciiFormatError(counter, line)
+                v1, v2, v3 = self.read_3_floats(f, 'vertex ', 7)
+                v4, v5, v6 = self.read_3_floats(f, 'vertex ', 7)
+                v7, v8, v9 = self.read_3_floats(f, 'vertex ', 7)
 
-            line = f.readline()[:-1]
-            counter+=1
-            if line.startswith('vertex '):
-                v7, v8, v9 = line[7:].split(' ')
-            else:
-                raise StlAsciiFormatError(counter, line)
+                self.read_line_equals(f, 'endloop')
+                self.read_line_equals(f, 'endfacet')
+ 
+                result.append([n1, n2, n3, v1, v2, v3, v4, v5, v6, v7, v8, v9])
 
-            line = f.readline()[:-1]
-            counter+=1
-            if not line == 'endloop':
-                raise StlAsciiFormatError(counter, line)
-
-            line = f.readline()[:-1]
-            counter+=1
-            if not line == 'endfacet':
-                raise StlAsciiFormatError(counter, line)
-
-            result.append([n1, n2, n3, v1, v2, v3, v4, v5, v6, v7, v8, v9])
-
-    return result
+        return result
