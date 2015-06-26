@@ -19,7 +19,7 @@ class Stl(object):
             v1, v2, v3 = self.line[shift:].split(' ')
         else:
             raise StlAsciiFormatError(self.counter, self.line)
-        return v1, v2, v3
+        return float(v1), float(v2), float(v3)
 
     def read_ascii(self, path):
         result = []
@@ -43,6 +43,6 @@ class Stl(object):
                 self.read_line_equals(f, 'endloop')
                 self.read_line_equals(f, 'endfacet')
  
-                result.append([n1, n2, n3, v1, v2, v3, v4, v5, v6, v7, v8, v9])
+                result.append([float(n1), float(n2), float(n3), v1, v2, v3, v4, v5, v6, v7, v8, v9])
 
         return result
