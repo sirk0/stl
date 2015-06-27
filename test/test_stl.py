@@ -47,13 +47,24 @@ class TestTriangle(BaseTestCase):
         self.assertFalse(triangle1.contacts(triangle2))
 
 class TestStl(BaseTestCase):
-    def test_contacts(self):
+    def test_contacts_triangle(self):
         stl = self.read_ascii('test/data/separate_triangles.stl')
         triangle1 = stl.triangles[0]
         triangle2 = stl.triangles[1]
-        self.assertTrue(stl.contacts(triangle1))
+        self.assertTrue(stl.contacts_triangle(triangle1))
 
-    def test_does_not_contact(self):
+    def test_does_not_contact_triangle(self):
         stl = self.read_ascii('test/data/separate_triangles.stl')
         stl1 = Stl([stl.triangles[0]])
-        self.assertFalse(stl1.contacts(stl.triangles[1]))
+        self.assertFalse(stl1.contacts_triangle(stl.triangles[1]))
+
+    def test_contacts_stl(self):
+        stl1 = self.read_ascii('test/data/separate_triangles.stl')
+        stl2 = self.read_ascii('test/data/separate_triangles.stl')
+        self.assertTrue(stl1.contacts_stl(stl2))
+
+    def test_does_not_contact_stl(self):
+        stl = self.read_ascii('test/data/separate_triangles.stl')
+        stl1 = Stl([stl.triangles[0]])
+        stl2 = Stl([stl.triangles[1]])
+        self.assertFalse(stl1.contacts_stl(stl2))

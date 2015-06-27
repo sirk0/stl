@@ -26,9 +26,13 @@ class Stl(Geometry):
     def __len__(self):
         return len(self.triangles)
 
-    def contacts(self, other_triangle):
+    def contacts_triangle(self, other_triangle):
         return any(my_triangle.contacts(other_triangle) 
             for my_triangle in self.triangles)
+    
+    def contacts_stl(self, other_stl):
+        return any(self.contacts_triangle(triangle) 
+            for triangle in other_stl.triangles)
 
 class StlAsciiFormatError(Exception):
     pass
