@@ -1,10 +1,10 @@
 from stl_reader import StlReader, StlAsciiFormatError
 import unittest
 
-class TestSTL(unittest.TestCase):
+class TestStlReader(unittest.TestCase):
     def setUp(self):
-        self.reader = StlReader()
-        self.read_ascii = self.reader.read_ascii
+        reader = StlReader()
+        self.read_ascii = reader.read_ascii
 
     def test_read(self):
         stl = self.read_ascii('test/data/cone_and_sphere.stl')
@@ -25,6 +25,26 @@ class TestSTL(unittest.TestCase):
                     0.00000000, 0.00000000, -5.00000000,
                     0.62660000, 0.00000000, -4.96050000]
         self.assertEquals(triangle.normal, exp_data[0:3])
-        self.assertEquals(triangle.point1, exp_data[3:6])
-        self.assertEquals(triangle.point2, exp_data[6:9])
-        self.assertEquals(triangle.point3, exp_data[9:12])
+        self.assertEquals(triangle.points[0], exp_data[3:6])
+        self.assertEquals(triangle.points[1], exp_data[6:9])
+        self.assertEquals(triangle.points[2], exp_data[9:12])
+
+    def test_non_existing(self):
+        self.assertRaises(IOError, self.read_ascii, 'test/data/non_existing.stl')
+
+class TestTriangle(unittest.TestCase):
+    def setUp(self):
+        reader = StlReader()
+        self.read_ascii = reader.read_ascii
+
+    def test_contacts(self):
+        stl = self.read_ascii('test/data/contacting_triangles.stl')
+        triangle1 = stl.triangles[0]
+        triangle2 = stl.triangles[1]
+        self.assertTrue(triangle1.contacts(triangle2))
+
+    def test_does_not_contact(self):
+        stl = self.read_ascii('test/data/separate_triangles.stl')
+        triangle1 = stl.triangles[0]
+        triangle2 = stl.triangles[1]
+        self.assertFalse(triangle1.contacts(triangle2))

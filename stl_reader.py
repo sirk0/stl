@@ -1,12 +1,26 @@
-class Triangle(object):
-    def __init__(self, normal, point1, point2, point3):
-        self.normal = normal
-        self.point1 = point1
-        self.point2 = point2
-        self.point3 = point3
+class Geometry(object):
+    def __init__(self):
+        self.eps = 0.00000001
+        self.eps2 = self.eps**2
 
-class Stl(object):
+    def point_distance2(self, p1, p2):
+        result = sum((p1[i]-p2[i])**2 for i in range(3))
+        return result
+
+class Triangle(Geometry):
+    def __init__(self, normal, point1, point2, point3):
+        super(Triangle, self).__init__()
+        self.normal = normal
+        self.points = [point1, point2, point3]
+
+    def contacts(self, other_triangle):
+        same_point_pairs = sum(self.point_distance2(p1, p2) < self.eps2
+            for p2 in other_triangle.points for p1 in self.points)
+        return same_point_pairs >= 2
+
+class Stl(Geometry):
     def __init__(self, triangles):
+        super(Stl, self).__init__()
         self.triangles = triangles
 
     def __len__(self):
@@ -18,7 +32,6 @@ class StlAsciiFormatError(Exception):
 class StlReader(object):
     def __init__(self):
         self.counter = -1
-        # self.data = self.read_ascii(path).triangles
 
     def read_line_equals(self, f, line):
         self.line = f.readline()[:-1]
@@ -33,7 +46,7 @@ class StlReader(object):
             v1, v2, v3 = self.line[shift:].split(' ')
         else:
             raise StlAsciiFormatError(self.counter, self.line)
-        return [float(p) for p in v1, v2, v3]
+        return [float(p) for p in (v1, v2, v3)]
 
     def read_ascii(self, path):
         triangles = []
