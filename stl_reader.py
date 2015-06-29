@@ -55,16 +55,8 @@ class BoundingBox(Geometry):
         return all(self.min[i] <= point[i] <= self.max[i] for i in range(3))
 
     def __add__(self, bounding_box):
-        # p_min = Point(min(self.min[i], bounding_box.min[i]) for i in range(3))
-        p_min = Point([
-            min(self.min.x, bounding_box.min.x),
-            min(self.min.y, bounding_box.min.y),
-            min(self.min.z, bounding_box.min.z)])
-        # p_max = Point(max(self.max[i], bounding_box.max[i]) for i in range(3))
-        p_max = Point([
-            max(self.max.x, bounding_box.max.x),
-            max(self.max.y, bounding_box.max.y),
-            max(self.max.z, bounding_box.max.z)])
+        p_min = Point([min(self.min[i], bounding_box.min[i]) for i in range(3)])
+        p_max = Point([max(self.max[i], bounding_box.max[i]) for i in range(3)])
         return BoundingBox(p_min, p_max)
 
 class Triangle(Geometry):
@@ -101,6 +93,10 @@ class Stl(Geometry):
     def __init__(self, triangles):
         super(Stl, self).__init__()
         self.triangles = triangles
+        inf = float('inf')
+        self.default_bounding_box = BoundingBox(
+            Point([inf,inf,inf]),
+            Point([-inf,-inf,-inf]))
         self.bounding_box = self.get_bounding_box()
 
     def __len__(self):
@@ -113,14 +109,8 @@ class Stl(Geometry):
         return self.triangles[index]
 
     def get_bounding_box(self):
-        inf = float('inf')
-        self.default_bounding_box = BoundingBox(
-            Point([inf,inf,inf]),
-            Point([-inf,-inf,-inf]))
-        result = self.default_bounding_box
-        for triangle in self:
-            result += triangle.bounding_box
-        return result
+        return sum((triangle.bounding_box for triangle in self), 
+            self.default_bounding_box)
 
     def add_triangle(self, triangle):
         self.triangles.append(triangle)
@@ -153,6 +143,23 @@ class Stl(Geometry):
             surfaces.append(current_surface)
             
         return surfaces
+
+#TODO
+class Surface(Geometry):
+    def __init__(self, triangles):
+        self.points = []
+        self.edges = []
+        for triangle in triangles:
+            self.add_triangle(triangle)
+
+    def add_triangle(self, triangle):
+        contacts = sum(p1 == p2 for p1 in triangle.points for p2 in self.points)
+        if contacts:
+            self.points.append(p for p in triangle.points)
+            p = triangle.points
+            self.edges.append((p[0], p[1]), (p[1], p[2]), (p[0], p[2]))
+        else:
+            raise TriangleNotContactsError
 
 class StlAsciiFormatError(Exception):
     pass
@@ -203,8 +210,3 @@ class StlReader(Stl):
                 triangles.append(triangle)
 
         raise StlAsciiFormatError(self.counter, self.line)
-
-##p1 = Point([0,0,0])
-##p2 = Point([0,0,1])
-##p3 = Point([0,1,0])
-##t = Triangle([1,0,0],p1,p2,p3)
