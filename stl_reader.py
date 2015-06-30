@@ -131,36 +131,6 @@ class Stl(Geometry):
         return any(self.contacts_triangle(triangle) 
             for triangle in other_stl)
 
-    #TODO
-    def split_surfaces(self):
-        triangles_copy = self.triangles[:]
-        surfaces = []
-        for triangle in triangles_copy:
-            current_surface = Stl([triangle])
-            for other_triangle in triangles_copy:
-                if current_surface.contacts_triangle(other_triangle):
-                    current_surface.add_triangle(other_triangle)
-            surfaces.append(current_surface)
-            
-        return surfaces
-
-#TODO
-class Surface(Geometry):
-    def __init__(self, triangles):
-        self.points = []
-        self.edges = []
-        for triangle in triangles:
-            self.add_triangle(triangle)
-
-    def add_triangle(self, triangle):
-        contacts = sum(p1 == p2 for p1 in triangle.points for p2 in self.points)
-        if contacts:
-            self.points.append(p for p in triangle.points)
-            p = triangle.points
-            self.edges.append((p[0], p[1]), (p[1], p[2]), (p[0], p[2]))
-        else:
-            raise TriangleNotContactsError
-
 class StlAsciiFormatError(Exception):
     pass
 
@@ -168,13 +138,13 @@ class StlReader(Stl):
     def __init__(self):
         self.counter = -1
 
-    def read_line_equals(self, f, line):
+    def _read_line_equals(self, f, line):
         self.line = f.readline()[:-1]
         self.counter+=1
         if not self.line == line:
             raise StlAsciiFormatError(self.counter, self.line)
 
-    def read_3_floats(self, f, prefix, shift):
+    def _read_3_floats(self, f, prefix, shift):
         self.line = f.readline()[:-1]
         self.counter+=1
         if self.line.startswith(prefix):
@@ -186,7 +156,7 @@ class StlReader(Stl):
     def read_ascii(self, path):
         triangles = []
         with open(path) as f:
-            self.read_line_equals(f, 'solid')
+            self._read_line_equals(f, 'solid')
 
             while True:
                 self.line = f.readline()[:-1]
@@ -197,14 +167,14 @@ class StlReader(Stl):
                 elif self.line.startswith('facet normal '):
                     normal = [float(p) for p in self.line[13:].split()]
 
-                self.read_line_equals(f, 'outer loop')
+                self._read_line_equals(f, 'outer loop')
 
-                point1 = self.read_3_floats(f, 'vertex ', 7)
-                point2 = self.read_3_floats(f, 'vertex ', 7)
-                point3 = self.read_3_floats(f, 'vertex ', 7)
+                point1 = self._read_3_floats(f, 'vertex ', 7)
+                point2 = self._read_3_floats(f, 'vertex ', 7)
+                point3 = self._read_3_floats(f, 'vertex ', 7)
 
-                self.read_line_equals(f, 'endloop')
-                self.read_line_equals(f, 'endfacet')
+                self._read_line_equals(f, 'endloop')
+                self._read_line_equals(f, 'endfacet')
                 
                 triangle = Triangle(normal, point1, point2, point3)
                 triangles.append(triangle)
