@@ -1,4 +1,5 @@
 import math
+import argparse
 
 class Geometry(object):
     def __init__(self):
@@ -194,3 +195,19 @@ class StlReader(Stl):
                 triangles.append(triangle)
 
         raise StlAsciiFormatError(self.counter, self.line)
+
+def parse_args():
+    parser = argparse.ArgumentParser(description='Read STL from file and calculate number of triangles')
+    parser.add_argument('-i', '--input', required=True,
+                       help='input STL file path')
+    args = parser.parse_args()
+    return args
+
+def main():
+    args = parse_args()
+    reader = StlReader()
+    stl = reader.read_ascii(args.input)
+    print(len(stl))
+
+if __name__ == '__main__':
+    main()
