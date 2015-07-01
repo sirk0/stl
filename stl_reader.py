@@ -1,3 +1,5 @@
+import math
+
 class Geometry(object):
     def __init__(self):
         self.eps = 0.00000001
@@ -89,6 +91,15 @@ class Triangle(Geometry):
     def get_bounding_box(self):
         return self.point1.bounding_box + self.point2.bounding_box + self.point3.bounding_box
 
+    def get_area(self):
+        v1 = [self.point2[i] - self.point1[i] for i in range(3)]
+        v2 = [self.point3[i] - self.point1[i] for i in range(3)]
+        v3 = [v1[1]*v2[2]-v2[1]*v1[2],
+              -v1[0]*v2[2]+v2[2]*v1[0],
+              v1[0]*v2[1]-v2[0]*v1[1]]
+        result = math.sqrt(sum(v3[i]**2 for i in range(3)))/2
+        return result
+
 class Stl(Geometry):
     def __init__(self, triangles):
         super(Stl, self).__init__()
@@ -130,6 +141,9 @@ class Stl(Geometry):
     def contacts_stl(self, other_stl):
         return any(self.contacts_triangle(triangle) 
             for triangle in other_stl)
+
+    def get_area(self):
+        return sum(triangle.get_area() for triangle in self)
 
 class StlAsciiFormatError(Exception):
     pass

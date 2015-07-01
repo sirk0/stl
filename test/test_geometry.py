@@ -67,6 +67,15 @@ class TestTriangle(BaseTestCase):
         self.assertEquals(t.bounding_box.min, p_min)
         self.assertEquals(t.bounding_box.max, p_max)
 
+    def test_area(self):
+        normal = [0,0,1]
+        p1 = Point([0,0,0])
+        p2 = Point([0,0,2])
+        p3 = Point([0,2,0])
+        t = Triangle(normal, p1, p2, p3)
+
+        self.assertEquals(t.get_area(), 2)
+
 class TestStl(BaseTestCase):
     def test_contacts_triangle(self):
         stl = self.read_ascii('test/data/separate_triangles.stl')
@@ -97,3 +106,13 @@ class TestStl(BaseTestCase):
 
         self.assertEquals(stl.bounding_box.min, p_min)
         self.assertEquals(stl.bounding_box.max, p_max)
+
+    def test_area(self):
+        normal = [0,0,1]
+        p1 = Point([0,0,0])
+        p2 = Point([0,0,2])
+        p3 = Point([0,2,0])
+        t = Triangle(normal, p1, p2, p3)
+        stl = Stl([t, t])
+
+        self.assertEquals(stl.get_area(), 4)
