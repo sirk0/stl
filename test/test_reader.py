@@ -1,5 +1,4 @@
 from stl_reader import StlAsciiFormatError
-import unittest
 from . import BaseTestCase
 
 class TestStlReader(BaseTestCase):
@@ -17,7 +16,7 @@ class TestStlReader(BaseTestCase):
         stl = self.read_ascii('test/data/one_triangle.stl')
         self.assertEquals(len(stl), 1)
         triangle = stl[0]
-        exp_data = [0.062913, -0.004007, -0.998011, 
+        exp_data = [0.062913, -0.004007, -0.998011,
                     0.62160000, -0.07850000, -4.96050000,
                     0.00000000, 0.00000000, -5.00000000,
                     0.62660000, 0.00000000, -4.96050000]

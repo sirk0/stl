@@ -73,7 +73,8 @@ class Triangle(Geometry):
         self.bounding_box = self.get_bounding_box()
 
     def __repr__(self):
-        return 'Triangle ' + ','.join('(' + ','.join(str(c) for c in p.coords) + ')' for p in self.points)
+        return 'Triangle ' + ','.join('(' + ','.join(str(c) for c in p.coords) + ')'
+            for p in self.points)
 
     def __iter__(self):
         return iter(self.points)
@@ -107,8 +108,8 @@ class Stl(Geometry):
         self.triangles = triangles
         inf = float('inf')
         self.default_bounding_box = BoundingBox(
-            Point([inf,inf,inf]),
-            Point([-inf,-inf,-inf]))
+            Point([inf, inf, inf]),
+            Point([-inf, -inf, -inf]))
         self.bounding_box = self.get_bounding_box()
 
     def __len__(self):
@@ -121,7 +122,7 @@ class Stl(Geometry):
         return self.triangles[index]
 
     def get_bounding_box(self):
-        return sum((triangle.bounding_box for triangle in self), 
+        return sum((triangle.bounding_box for triangle in self),
             self.default_bounding_box)
 
     def add_triangle(self, triangle):
@@ -134,13 +135,13 @@ class Stl(Geometry):
 
     def contacts_triangle(self, other_triangle):
         if sum(other_triangle.points[i] in self.bounding_box for i in range(3)) > 1:
-            return any(my_triangle.contacts(other_triangle) 
+            return any(my_triangle.contacts(other_triangle)
                 for my_triangle in self)
         else:
             return False
-    
+
     def contacts_stl(self, other_stl):
-        return any(self.contacts_triangle(triangle) 
+        return any(self.contacts_triangle(triangle)
             for triangle in other_stl)
 
     def get_area(self):
@@ -149,19 +150,20 @@ class Stl(Geometry):
 class StlAsciiFormatError(Exception):
     pass
 
-class StlReader(Stl):
+class StlReader(object):
     def __init__(self):
         self.counter = -1
+        self.line = ''
 
     def _read_line_equals(self, f, line):
         self.line = f.readline()[:-1]
-        self.counter+=1
+        self.counter += 1
         if not self.line == line:
             raise StlAsciiFormatError(self.counter, self.line)
 
     def _read_3_floats(self, f, prefix, shift):
         self.line = f.readline()[:-1]
-        self.counter+=1
+        self.counter += 1
         if self.line.startswith(prefix):
             v1, v2, v3 = self.line[shift:].split(' ')
         else:
@@ -175,7 +177,7 @@ class StlReader(Stl):
 
             while True:
                 self.line = f.readline()[:-1]
-                self.counter+=1
+                self.counter += 1
                 if self.line == 'endsolid':
                     stl = Stl(triangles)
                     return stl
@@ -190,16 +192,17 @@ class StlReader(Stl):
 
                 self._read_line_equals(f, 'endloop')
                 self._read_line_equals(f, 'endfacet')
-                
+
                 triangle = Triangle(normal, point1, point2, point3)
                 triangles.append(triangle)
 
         raise StlAsciiFormatError(self.counter, self.line)
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Read STL from file and calculate number of triangles')
+    parser = argparse.ArgumentParser(
+        description='Read STL from file and calculate number of triangles')
     parser.add_argument('-i', '--input', required=True,
-                       help='input STL file path')
+        help='input STL file path')
     args = parser.parse_args()
     return args
 
