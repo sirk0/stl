@@ -5,12 +5,12 @@ class TestPoint(BaseTestCase):
     def test_point_equals(self):
         point1 = Point([1, 2, 3])
         point2 = Point([1.0, 2.0, 3.0])
-        self.assertTrue(point1 == point2)
+        self.assertEquals(point1, point2)
 
     def test_point_not_equals(self):
         point1 = Point([1, 2, 3])
         point2 = Point([1.0, 2.0, 3.1])
-        self.assertFalse(point1 == point2)
+        self.assertNotEquals(point1, point2)
 
     def test_point_boundain_box(self):
         point = Point([1, 2, 3])
@@ -26,8 +26,8 @@ class TestBoundingBox(BaseTestCase):
         point3 = Point([4, 4, 4])
         point4 = Point([3, 2, 1])
 
-        self.assertTrue(point3 in bounding_box)
-        self.assertFalse(point4 in bounding_box)
+        self.assertIn(point3, bounding_box)
+        self.assertNotIn(point4, bounding_box)
 
     def test_add(self):
         point1 = Point([1, 2, 3])

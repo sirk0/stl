@@ -83,12 +83,7 @@ class Triangle(Geometry):
         return self.points[index]
 
     def contacts(self, other_triangle):
-        same_point_pairs = sum(p1 == p2 for p2 in other_triangle for p1 in self)
-        return same_point_pairs >= 2
-
-    def point_distance2(self, point2):
-        result = sum((self[i]-point2[i])**2 for i in range(3))
-        return result
+        return any(p1 == p2 for p2 in other_triangle for p1 in self)
 
     def get_bounding_box(self):
         return self.point1.bounding_box + self.point2.bounding_box + self.point3.bounding_box
