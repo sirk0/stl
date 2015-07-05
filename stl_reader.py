@@ -169,10 +169,13 @@ class StlReader(object):
         self.line = f.readline()[:-1]
         self.counter += 1
         if self.line.startswith(prefix):
-            v1, v2, v3 = self.line[shift:].split(' ')
+            try:
+                v1, v2, v3 = [float(p) for p in self.line[shift:].split(' ')]
+            except ValueError:
+                raise StlAsciiFormatError(self.counter, self.line)
         else:
             raise StlAsciiFormatError(self.counter, self.line)
-        return [float(p) for p in (v1, v2, v3)]
+        return [v1, v2, v3]
 
     def read_ascii(self, path):
         triangles = []

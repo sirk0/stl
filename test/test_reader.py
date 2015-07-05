@@ -30,4 +30,10 @@ class TestStlReader(BaseTestCase):
 
     def test_two_points(self):
         self.assertRaises(StlAsciiFormatError, self.read_ascii, 'test/data/two_points.stl')
+
+    def test_two_coords(self):
+        self.assertRaises(StlAsciiFormatError, self.read_ascii, 'test/data/two_coords.stl')
+
+    def test_string_coords(self):
+        self.assertRaises(StlAsciiFormatError, self.read_ascii, 'test/data/string_coords.stl')
     
