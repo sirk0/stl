@@ -61,7 +61,7 @@ class TestTriangle(BaseTestCase):
         point_min = Point([1, 2, 1])
         point_max = Point([3, 2, 3])
 
-        triangle = Triangle(normal, point1, point2, point3)
+        triangle = Triangle(point1, point2, point3, normal)
 
         self.assertEquals(triangle.bounding_box.min, point_min)
         self.assertEquals(triangle.bounding_box.max, point_max)
@@ -71,7 +71,7 @@ class TestTriangle(BaseTestCase):
         point1 = Point([0, 0, 0])
         point2 = Point([0, 0, 2])
         point3 = Point([0, 2, 0])
-        triangle = Triangle(normal, point1, point2, point3)
+        triangle = Triangle(point1, point2, point3, normal)
 
         self.assertEquals(triangle.get_area(), 2)
 
@@ -110,7 +110,7 @@ class TestStl(BaseTestCase):
         point1 = Point([0, 0, 0])
         point2 = Point([0, 0, 2])
         point3 = Point([0, 2, 0])
-        triangle = Triangle(normal, point1, point2, point3)
+        triangle = Triangle(point1, point2, point3, normal)
         stl = Stl([triangle, triangle])
 
         self.assertEquals(stl.get_area(), 4)

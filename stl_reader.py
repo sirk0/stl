@@ -33,8 +33,20 @@ class Point(Geometry):
     def __eq__(self, point2):
         return all(abs(self[i]-point2[i]) < self.eps for i in range(3))
 
+    def __sub__(self, point2):
+        return Point([self[i] - point2[i] for i in range(3)])
+
     def get_bounding_box(self):
         return BoundingBox(self, self)
+
+    def multiply_vect(self, point2):
+        v3 = [self[1]*point2[2]-point2[1]*self[2],
+              -self[0]*point2[2]+point2[2]*self[0],
+              self[0]*point2[1]-point2[0]*self[1]]
+        return Point(v3)
+
+    def get_vector_length(self):
+        return math.sqrt(sum(self[i]**2 for i in range(3)))/2.0
 
 class BoundingBox(Geometry):
     def __init__(self, point_min, point_max):
@@ -63,7 +75,7 @@ class BoundingBox(Geometry):
         return BoundingBox(p_min, p_max)
 
 class Triangle(Geometry):
-    def __init__(self, normal, point1, point2, point3):
+    def __init__(self, point1, point2, point3, normal=None):
         super(Triangle, self).__init__()
         self.normal = Point(normal)
         self.point1 = Point(point1)
@@ -89,13 +101,10 @@ class Triangle(Geometry):
         return self.point1.bounding_box + self.point2.bounding_box + self.point3.bounding_box
 
     def get_area(self):
-        v1 = [self.point2[i] - self.point1[i] for i in range(3)]
-        v2 = [self.point3[i] - self.point1[i] for i in range(3)]
-        v3 = [v1[1]*v2[2]-v2[1]*v1[2],
-              -v1[0]*v2[2]+v2[2]*v1[0],
-              v1[0]*v2[1]-v2[0]*v1[1]]
-        result = math.sqrt(sum(v3[i]**2 for i in range(3)))/2
-        return result
+        v1 = self.point2 - self.point1
+        v2 = self.point3 - self.point1
+        v3 = v1.multiply_vect(v2)
+        return v3.get_vector_length()
 
 class Stl(Geometry):
     def __init__(self, triangles):
@@ -188,7 +197,7 @@ class StlReader(object):
                 self._read_line_equals(f, 'endloop')
                 self._read_line_equals(f, 'endfacet')
 
-                triangle = Triangle(normal, point1, point2, point3)
+                triangle = Triangle(point1, point2, point3, normal)
                 triangles.append(triangle)
 
         raise StlAsciiFormatError(self.counter, self.line)
