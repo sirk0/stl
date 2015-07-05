@@ -51,9 +51,7 @@ class Point(Geometry):
 class BoundingBox(Geometry):
     def __init__(self, point_min, point_max):
         super(BoundingBox, self).__init__()
-        if type(point_min) != Point:
-            raise TypeError
-        if type(point_max) != Point:
+        if type(point_min) != Point or type(point_max) != Point:
             raise TypeError
         self.min = point_min
         self.max = point_max
