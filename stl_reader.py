@@ -46,7 +46,7 @@ class Point(Geometry):
         return Point(v3)
 
     def get_vector_length(self):
-        return math.sqrt(sum(self[i]**2 for i in range(3)))/2.0
+        return math.sqrt(sum(self[i]**2 for i in range(3)))
 
 class BoundingBox(Geometry):
     def __init__(self, point_min, point_max):
@@ -104,7 +104,7 @@ class Triangle(Geometry):
         v1 = self.point2 - self.point1
         v2 = self.point3 - self.point1
         v3 = v1.multiply_vect(v2)
-        return v3.get_vector_length()
+        return v3.get_vector_length()/2.0
 
 class Stl(Geometry):
     def __init__(self, triangles):

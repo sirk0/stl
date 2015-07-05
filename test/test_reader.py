@@ -27,3 +27,7 @@ class TestStlReader(BaseTestCase):
 
     def test_non_existing(self):
         self.assertRaises(IOError, self.read_ascii, 'test/data/non_existing.stl')
+
+    def test_two_points(self):
+        self.assertRaises(StlAsciiFormatError, self.read_ascii, 'test/data/two_points.stl')
+    

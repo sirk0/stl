@@ -17,6 +17,22 @@ class TestPoint(BaseTestCase):
         self.assertEquals(point.bounding_box.min, point)
         self.assertEquals(point.bounding_box.max, point)
 
+    def test_point_subtract(self):
+        point1 = Point([1, 2, 3])
+        point2 = Point([4, 5, 6])
+        point3 = point2 - point1
+        self.assertEquals(point3, Point([3, 3, 3]))
+
+    def test_multiply_vect(self):
+        point1 = Point([1, 0, 0])
+        point2 = Point([0, 1, 0])
+        point3 = point1.multiply_vect(point2)
+        self.assertEquals(point3, Point([0, 0, 1]))
+
+    def test_vector_length(self):
+        point = Point([3, 0, 4])
+        self.assertEquals(point.get_vector_length(), 5)
+
 class TestBoundingBox(BaseTestCase):
     def test_in(self):
         point1 = Point([1, 2, 3])
