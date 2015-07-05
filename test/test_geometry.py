@@ -31,7 +31,7 @@ class TestPoint(BaseTestCase):
 
     def test_vector_length(self):
         point = Point([3, 0, 4])
-        self.assertEquals(point.get_vector_length(), 5)
+        self.assertEquals(point.vector_length, 5)
 
 class TestBoundingBox(BaseTestCase):
     def test_in(self):
@@ -87,7 +87,7 @@ class TestTriangle(BaseTestCase):
         point3 = Point([0, 2, 0])
         triangle = Triangle(point1, point2, point3)
 
-        self.assertEquals(triangle.get_area(), 2)
+        self.assertEquals(triangle.area, 2)
 
     def test_default_normal(self):
         point1 = Point([0, 0, 0])

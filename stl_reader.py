@@ -16,7 +16,6 @@ class Point(Geometry):
         self.z = coords[2]
         if len(coords) != 3:
             raise TypeError
-        self.bounding_box = self.get_bounding_box()
 
     def __len__(self):
         return len(self.coords)
@@ -36,7 +35,8 @@ class Point(Geometry):
     def __sub__(self, point2):
         return Point([self[i] - point2[i] for i in range(3)])
 
-    def get_bounding_box(self):
+    @property
+    def bounding_box(self):
         return BoundingBox(self, self)
 
     def multiply_vect(self, point2):
@@ -45,7 +45,8 @@ class Point(Geometry):
               self[0]*point2[1]-point2[0]*self[1]]
         return Point(v3)
 
-    def get_vector_length(self):
+    @property
+    def vector_length(self):
         return math.sqrt(sum(self[i]**2 for i in range(3)))
 
 class BoundingBox(Geometry):
@@ -83,7 +84,6 @@ class Triangle(Geometry):
         self.point2 = Point(point2)
         self.point3 = Point(point3)
         self.points = [self.point1, self.point2, self.point3]
-        self.bounding_box = self.get_bounding_box()
 
     def __repr__(self):
         return 'Triangle ' + ','.join('(' + ','.join(str(c) for c in p.coords) + ')'
@@ -98,14 +98,16 @@ class Triangle(Geometry):
     def contacts(self, other_triangle):
         return any(p1 == p2 for p2 in other_triangle for p1 in self)
 
-    def get_bounding_box(self):
+    @property
+    def bounding_box(self):
         return self.point1.bounding_box + self.point2.bounding_box + self.point3.bounding_box
 
-    def get_area(self):
+    @property
+    def area(self):
         v1 = self.point2 - self.point1
         v2 = self.point3 - self.point1
         v3 = v1.multiply_vect(v2)
-        return v3.get_vector_length()/2.0
+        return v3.vector_length/2.0
 
 class Stl(Geometry):
     def __init__(self, triangles):
@@ -150,7 +152,7 @@ class Stl(Geometry):
             for triangle in other_stl)
 
     def get_area(self):
-        return sum(triangle.get_area() for triangle in self)
+        return sum(triangle.area for triangle in self)
 
 class StlAsciiFormatError(Exception):
     pass
