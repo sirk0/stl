@@ -39,7 +39,7 @@ class Point(Geometry):
     def get_bounding_box(self):
         return BoundingBox(self, self)
 
-    def multiply_vect(self, point2, normalised=False):
+    def multiply_vect(self, point2):
         v3 = [self[1]*point2[2]-point2[1]*self[2],
               -self[0]*point2[2]+point2[2]*self[0],
               self[0]*point2[1]-point2[0]*self[1]]
@@ -78,7 +78,7 @@ class Triangle(Geometry):
     def __init__(self, point1, point2, point3, normal=None):
         super(Triangle, self).__init__()
         if normal is None:
-            self.normal = (point3 - point1).multiply_vect(point2 - point1, normalised=True)
+            self.normal = (point3 - point1).multiply_vect(point2 - point1)
         else:
             self.normal = Point(normal)
         self.point1 = Point(point1)
@@ -141,7 +141,7 @@ class Stl(Geometry):
             self.add_triangle(triangle)
 
     def contacts_triangle(self, other_triangle):
-        if sum(other_triangle.points[i] in self.bounding_box for i in range(3)) > 1:
+        if any(other_triangle.points[i] in self.bounding_box for i in range(3)):
             return any(my_triangle.contacts(other_triangle)
                 for my_triangle in self)
         else:
