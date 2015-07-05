@@ -4,7 +4,6 @@ import argparse
 class Geometry(object):
     def __init__(self):
         self.eps = 0.00000001
-        self.eps2 = self.eps**2
 
 class Point(Geometry):
     def __init__(self, coords):
