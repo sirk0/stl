@@ -39,7 +39,7 @@ class Point(Geometry):
     def get_bounding_box(self):
         return BoundingBox(self, self)
 
-    def multiply_vect(self, point2):
+    def multiply_vect(self, point2, normalised=False):
         v3 = [self[1]*point2[2]-point2[1]*self[2],
               -self[0]*point2[2]+point2[2]*self[0],
               self[0]*point2[1]-point2[0]*self[1]]
@@ -77,7 +77,10 @@ class BoundingBox(Geometry):
 class Triangle(Geometry):
     def __init__(self, point1, point2, point3, normal=None):
         super(Triangle, self).__init__()
-        self.normal = Point(normal)
+        if normal is None:
+            self.normal = (point3 - point1).multiply_vect(point2 - point1, normalised=True)
+        else:
+            self.normal = Point(normal)
         self.point1 = Point(point1)
         self.point2 = Point(point2)
         self.point3 = Point(point3)

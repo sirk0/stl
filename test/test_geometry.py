@@ -70,26 +70,33 @@ class TestTriangle(BaseTestCase):
         self.assertFalse(triangle1.contacts(triangle2))
 
     def test_bounding_box(self):
-        normal = [0, 0, 1]
         point1 = Point([1, 2, 3])
         point2 = Point([3, 2, 1])
         point3 = Point([2, 2, 2])
         point_min = Point([1, 2, 1])
         point_max = Point([3, 2, 3])
 
-        triangle = Triangle(point1, point2, point3, normal)
+        triangle = Triangle(point1, point2, point3)
 
         self.assertEquals(triangle.bounding_box.min, point_min)
         self.assertEquals(triangle.bounding_box.max, point_max)
 
     def test_area(self):
-        normal = [0, 0, 1]
         point1 = Point([0, 0, 0])
         point2 = Point([0, 0, 2])
         point3 = Point([0, 2, 0])
-        triangle = Triangle(point1, point2, point3, normal)
+        triangle = Triangle(point1, point2, point3)
 
         self.assertEquals(triangle.get_area(), 2)
+
+    def test_default_normal(self):
+        point1 = Point([0, 0, 0])
+        point2 = Point([0, 0, 2])
+        point3 = Point([0, 2, 0])
+        triangle = Triangle(point1, point2, point3)
+
+        self.assertEquals(triangle.normal, Point([4, 0, 0]))
+
 
 class TestStl(BaseTestCase):
     def test_contacts_triangle(self):
@@ -122,11 +129,10 @@ class TestStl(BaseTestCase):
         self.assertEquals(stl.bounding_box.max, point_max)
 
     def test_area(self):
-        normal = [0, 0, 1]
         point1 = Point([0, 0, 0])
         point2 = Point([0, 0, 2])
         point3 = Point([0, 2, 0])
-        triangle = Triangle(point1, point2, point3, normal)
+        triangle = Triangle(point1, point2, point3)
         stl = Stl([triangle, triangle])
 
         self.assertEquals(stl.get_area(), 4)
